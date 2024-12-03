@@ -1,39 +1,22 @@
-"use client"
-import { useState, useEffect } from 'react'
+'use client'
 import Card from '../../../../components/card';
-import { useParams } from 'next/navigation'
-// Komentar
-import { Editor } from '@tinymce/tinymce-react';
+import { useState, useEffect } from 'react'
 import { useRef } from 'react';
-import ConfigDialog from '../../../../components/ConfirmDialog'
+import { useParams } from 'next/navigation'
 
-export default function Blogsbyid(){
-    // Komentar
+export default function Blogsbyid() {
+    const params = useParams();
+    // const [data, setData] = useState(null)
+    const [isLoading, setLoading] = useState(true)
+
     const editorRef = useRef(null);
     const [modal, setModal] = useState(false)
-    const [modalTitle, setModalTitle] = useState("")
-    const [modalMessage, setModalMessage] = useState("")
-    // Komentar end
-    const params = useParams();
-    const [data, setData] = useState(null)
-    const [isLoading, setLoading] = useState(true)
-     // Komentar
-    const [datakomen, setDataKomen] = useState({
+    const [modalnama, setModalnama] = useState("")
+    const [modalkomentar, setModalkomentar] = useState("")
+    const [data, setData] = useState({
         nama:'',
-        email:'',
         komentar:'',
     });
-    const clearData = ()=>{
-        setDataKomen({
-            nama:'',
-            email:'',
-            komentar:'',
-        })
-    } 
-    const inputHandler= (e) =>{
-        setDataKomen({...datakomen, [e.target.name]: e.target.value })
-    }
-    // End Komentar
 
     const onFetchBlogs=async()=>{
         try{
@@ -48,22 +31,37 @@ export default function Blogsbyid(){
             setLoading(false)
         }
     }
-    // Komentar
+    useEffect(()=>{
+        onFetchBlogs()
+    },[])
+
+    if(isLoading) return (<>Loading...</>)
+
+    const clearData = ()=>{
+        setData({
+            nama:'',
+            komentar:'',
+        })
+    }
+
+    const inputHandler= (e) =>{
+        setData({...data, [e.target.name]: e.target.value })
+    }
+
     const onCancel=()=>{
         setModal(false)
-        setModalTitle('')
-        setModalMessage('')
+        setModalnama('')
+        setModalkomentar('')
         clearData()
     }
-    // end Komentar
 
     async function onSubmitData() {
         try{
             if (editorRef.current) {
-                const body = datakomen
+                const body = data
                 body.content = editorRef.current.getContent();
 
-                let res = await fetch('/api/komenblog', {
+                let res = await fetch('/api/blogs', {
                     method:'POST',
                     body: JSON.stringify(body),
                 })
@@ -73,92 +71,61 @@ export default function Blogsbyid(){
                 throw Error(resData.message)
                 }
                 setModal(true)
-                setModalTitle('Info')
-                setModalMessage(resData.message)
+                setModalnama('Info')
+                setModalkomentar(resData.message)
             }
         }catch(err){
           console.error("ERR", err.message)
           setModal(true)
-          setModalTitle('Err')
-          setModalMessage(err.message)
+          setModalnama('Err')
+          setModalkomentar(err.message)
         }
       }
 
-
-    useEffect(()=>{
-        onFetchBlogs()
-    },[])
-
-    if(isLoading) return (<>Loading...</>)
-
     return (
-        <>
+    <>
+  
             <div className='margin-0 mx-auto w-2/3'>
                 <h2 className="text-center text-[32px] font-bold w-full">{data.title}</h2>
-                <div className='mb-40 mt-10  ' dangerouslySetInnerHTML={{ __html: data.content }}/>
+                <div className='mt-10  ' dangerouslySetInnerHTML={{ __html: data.content }}/>
             </div>
 
-            {/* Start Komentar */}
-            <Card title="Tuliskan komentar">
-            <div className="w-full my-5">
+        <Card title="Blogs Form">
+            <div className="w-full my-2">
                 <label>Nama</label>
                     <input 
                         name='nama'
-                        value={datakomen.nama}
+                        value={data.nama}
                         onChange={inputHandler}
                         type="text" 
                         className="w-full border my-input-text"/>
             </div>
-
+            
             <div className="w-full my-2">
-                <label>Email</label>
+                <label>komentar</label>
                     <input 
-                        name='email'
-                        value={datakomen.email}
+                        name='komentar'
+                        value={data.komentar}
                         onChange={inputHandler}
                         className="w-full border my-input-text"/>
             </div>
 
-            <div className="w-full my-2">
-                <label>Komentar</label>
-                <Editor
-                    id='komentar'
-                    apiKey='hz9os6h0p1826jcqknks4q1fm8yl9khctaa7nmexkf0rnx2e'
-                    onInit={(_evt, editor) => editorRef.current = editor}
-                    initialValue={datakomen.komentar}
-                    init={{
-                    height: 500,
-                    menubar: false,
-                    plugins: [
-                        'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-                        'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                        'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
-                    ],
-                    toolbar: 'undo redo | blocks | ' +
-                        'bold italic forecolor | alignleft aligncenter ' +
-                        'alignright alignjustify | bullist numlist outdent indent | ' +
-                        'removeformat | help',
-                    content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
-                    }}
-                />
-            </div>
 
             <button  className="btn-primary" onClick={onSubmitData}>
                 <span className="relative text-sm font-semibold text-white">
-                    Kirim
+                    Submit
                 </span>
             </button>
         </Card>
 
-        <ConfigDialog  
+        {/* <ConfigDiaglog
             onOkOny={()=>onCancel()} 
             showDialog={modal}
-            title={modalTitle}
-            message={modalMessage}
+            nama={modalnama}
+            komentar={modalkomentar}
             onCancel={()=>onCancel()} 
             onOk={()=>onCancel()} 
-            isOkOnly={true} />
-        {/* End Komentar */}
-        </>
-    );
+            isOkOnly={true} /> */}
+    </>
+    )
 }
