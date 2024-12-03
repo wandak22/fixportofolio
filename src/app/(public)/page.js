@@ -37,7 +37,7 @@ export default function Dashboard() {
                 <span className="text-[#FFB400]">Back end</span> Developer 
               </div>
             </div>
-            <p className="text-[#767676]">Wanda khairunnisa mahasiswa semester 5 manajemen informatika </p>
+            <p className="text-[#767676]">Wanda khairunnisa mahasiswa semester 5 manajement informatika  </p>
             <button className="btn-primary mt-5">
               <span className="relative text-sm font-semibold text-white">
                   Stay Here
