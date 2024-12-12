@@ -14,7 +14,7 @@ const CardItem = ({ title, subTitle})=>{
                 <div className="text-[18px]">{title}</div>
                 <div className="text-[#767676] w-full h-[50px] text-ellipsis overflow-hidden">{subTitle}</div>
                 <div className="mt-3 text-[#FFB400]">
-                    Learn more
+                    Learn moree
                 </div>
             </div>
         </div>
